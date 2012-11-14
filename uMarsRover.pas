@@ -69,7 +69,7 @@ type
     FPosition: TPoint;
     FDirection: TDirection;
 
-    function MoveByOffset(const AOffset: Integer): Boolean;
+    procedure MoveByOffset(const AOffset: Integer);
 
     function CalcMovePosition(const AOffset: Integer): TPoint;
     function FixGridWrap(const APosition: TPoint): TPoint;
@@ -259,10 +259,9 @@ begin
   end;
 end;
 
-function TMarsRover.MoveByOffset(const AOffset: Integer): Boolean;
+procedure TMarsRover.MoveByOffset(const AOffset: Integer);
 begin
   FPosition := CalcMovePosition(AOffset);
-  Result := True;
 end;
 
 function TMarsRover.CalcMovePosition(const AOffset: Integer): TPoint;
