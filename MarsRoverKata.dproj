@@ -2,7 +2,7 @@
 		<PropertyGroup>
 			<ProjectGuid>{A33544E4-294B-4963-953E-98A5BACCBCFA}</ProjectGuid>
 			<ProjectVersion>12.0</ProjectVersion>
-			<Config Condition="'$(Config)'==''">Debug</Config>
+			<Config Condition="'$(Config)'==''">Release</Config>
 			<DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
 			<MainSource>MarsRoverKata.dpr</MainSource>
 		</PropertyGroup>
@@ -29,12 +29,13 @@
 			<DCC_ImageBase>00400000</DCC_ImageBase>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_1)'!=''">
+			<DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
+			<DCC_MapFile>3</DCC_MapFile>
 			<DCC_ExeOutput>bin\autotest</DCC_ExeOutput>
 			<DCC_DependencyCheckOutputName>bin\autotest\MarsRoverKata.exe</DCC_DependencyCheckOutputName>
 			<DCC_DcuOutput>dcu\autotest</DCC_DcuOutput>
 			<DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
 			<DCC_Define>RELEASE;CONSOLE_TESTRUNNER;$(DCC_Define)</DCC_Define>
-			<DCC_DebugInformation>false</DCC_DebugInformation>
 			<DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_2)'!=''">
@@ -45,10 +46,12 @@
 				<MainSource>MainSource</MainSource>
 			</DelphiCompile>
 			<DCCReference Include="XmlTestRunner.pas"/>
-			<DCCReference Include="TestMarsRover.pas"/>
+			<DCCReference Include="TestMarsRoverTurning.pas"/>
 			<DCCReference Include="uMarsRover.pas"/>
-			<DCCReference Include="XmlTestRunner.pa"/>
-			<DCCReference Include="XmlTestRunner.p"/>
+			<DCCReference Include="TestMarsRoverMoving.pas"/>
+			<DCCReference Include="TestMarsRoverBase.pas"/>
+			<DCCReference Include="TestMarsRoverLookahead.pas"/>
+			<DCCReference Include="TestMarsRoverController.pas"/>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
 			</BuildConfiguration>
