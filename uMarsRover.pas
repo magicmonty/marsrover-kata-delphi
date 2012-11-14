@@ -19,7 +19,7 @@ type
     property Height: Integer read GetHeight;
 
     procedure SetObstacleAt(const X, Y: Integer);
-    function IsObstacleAt(const X, Y: Integer): Boolean;
+    function IsObstacleAt(const Position: TPoint): Boolean;
   end;
 
   TObstacles = TList<TPoint>;
@@ -39,7 +39,7 @@ type
     constructor Create(const AWidth, AHeight: Integer);
     destructor Destroy; override;
     procedure SetObstacleAt(const X, Y: Integer);
-    function IsObstacleAt(const X, Y: Integer): Boolean;
+    function IsObstacleAt(const Position: TPoint): Boolean;
   end;
 
   IMarsRover = interface
@@ -173,21 +173,19 @@ begin
   Result := FWidth;
 end;
 
-function TGrid.IsObstacleAt(const X, Y: Integer): Boolean;
+function TGrid.IsObstacleAt(const Position: TPoint): Boolean;
 begin
-  Result := FObstacles.Contains(Point(X, Y));
+  Result := FObstacles.Contains(Position);
 end;
 
 procedure TGrid.SetObstacleAt(const X, Y: Integer);
 begin
-  if not IsObstacleAt(X, Y) then
+  if not IsObstacleAt(Point(X, Y)) then
     FObstacles.Add(Point(X, Y));
 end;
-
 {$endregion 'TGrid'}
 
-{ TMarsRover }
-
+{$region 'TMarsRover'}
 constructor TMarsRover.Create(
   const AGrid: IGrid;
   const APosition: TPoint;
@@ -297,25 +295,17 @@ begin
 end;
 
 function TMarsRover.IsObstacleAhead: Boolean;
-var
-  nextPosition: TPoint;
 begin
-  nextPosition := CalcMovePosition(1);
-  Result := FGrid.IsObstacleAt(nextPosition.X, nextPosition.Y);
+  Result := FGrid.IsObstacleAt(CalcMovePosition(1));
 end;
 
 function TMarsRover.IsObstacleBehind: Boolean;
-var
-  nextPosition: TPoint;
 begin
-  nextPosition := CalcMovePosition(-1);
-  Result := FGrid.IsObstacleAt(nextPosition.X, nextPosition.Y);
+  Result := FGrid.IsObstacleAt(CalcMovePosition(-1));
 end;
+{$endregion 'TMarsRover'}
 
-
-
-{ TMarsRoverController }
-
+{$region 'TMarsRoverController'}
 constructor TMarsRoverController.Create(const ARover: IMarsRover);
 begin
   inherited Create;
@@ -370,9 +360,18 @@ begin
     end;
   end;
 end;
+{$endregion 'TMarsRoverController'}
 
-
-{ TObstacleAheadException }
+{$region 'TObstacleException'}
+constructor TObstacleException.Create(
+  const Message: string;
+  const ACurrentPosition: TPoint;
+  const ACurrentDirection: TDirection);
+begin
+  inherited Create(Message);
+  FCurrentPosition := ACurrentPosition;
+  FCurrentDirection := ACurrentDirection;
+end;
 
 constructor TObstacleAheadException.Create(
   const CurrentPosition: TPoint;
@@ -397,7 +396,6 @@ begin
   );
 end;
 
-{ TObstacleBehindException }
 constructor TObstacleBehindException.Create(
   const CurrentPosition: TPoint;
   const CurrentDirection: TDirection);
@@ -420,17 +418,6 @@ begin
     CurrentDirection
   );
 end;
-
-{ TObstacleException }
-
-constructor TObstacleException.Create(
-  const Message: string;
-  const ACurrentPosition: TPoint;
-  const ACurrentDirection: TDirection);
-begin
-  inherited Create(Message);
-  FCurrentPosition := ACurrentPosition;
-  FCurrentDirection := ACurrentDirection;
-end;
+{$endregion 'TObstacleException'}
 
 end.
