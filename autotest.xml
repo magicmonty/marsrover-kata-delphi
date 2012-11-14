@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<buildrunner>
+  <environment>
+    <!-- You might want to set this var in your global environment variables -->
+    <!-- <BDS>C:\Program Files (x86)\CodeGear\RAD Studio\6.0</BDS> -->
+    <FrameworkDir>%WINDIR%\Microsoft.NET\Framework64\</FrameworkDir>
+    <FrameworkVersion>v3.5</FrameworkVersion>
+    <FrameworkSDKDir></FrameworkSDKDir>
+    <Path>%FrameworkDir%%FrameworkVersion%;%FrameworkSDKDir%;%Path%</Path>
+  </environment>
+  <build>
+    <command>msbuild.exe</command>
+    <params>/nologo /verbosity:quiet /p:config=Release %CD%\MarsRoverKata.dproj</params>
+  </build>
+  <test>
+    <command>%CD%\bin\autotest\MarsRoverKata.exe</command>
+    <params></params>
+  </test>
+</buildrunner>

@@ -1,0 +1,36 @@
+﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+		<PropertyGroup>
+			<ProjectGuid>{B6537E19-6583-4090-8203-C7B0B7B93E9D}</ProjectGuid>
+		</PropertyGroup>
+		<ItemGroup>
+			<Projects Include="MarsRoverKata.dproj">
+				<Dependencies/>
+			</Projects>
+		</ItemGroup>
+		<ProjectExtensions>
+			<Borland.Personality>Default.Personality.12</Borland.Personality>
+			<Borland.ProjectType/>
+			<BorlandProject>
+				<Default.Personality/>
+			</BorlandProject>
+		</ProjectExtensions>
+		<Target Name="MarsRoverKata">
+			<MSBuild Projects="MarsRoverKata.dproj"/>
+		</Target>
+		<Target Name="MarsRoverKata:Clean">
+			<MSBuild Targets="Clean" Projects="MarsRoverKata.dproj"/>
+		</Target>
+		<Target Name="MarsRoverKata:Make">
+			<MSBuild Targets="Make" Projects="MarsRoverKata.dproj"/>
+		</Target>
+		<Target Name="Build">
+			<CallTarget Targets="MarsRoverKata"/>
+		</Target>
+		<Target Name="Clean">
+			<CallTarget Targets="MarsRoverKata:Clean"/>
+		</Target>
+		<Target Name="Make">
+			<CallTarget Targets="MarsRoverKata:Make"/>
+		</Target>
+		<Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+	</Project>
