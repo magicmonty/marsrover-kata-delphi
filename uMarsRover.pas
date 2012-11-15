@@ -237,18 +237,18 @@ end;
 
 procedure TMarsRover.MoveForward;
 begin
-  if not IsObstacleAhead then
-    MoveByOffset(MOVE_FORWARD)
+  if IsObstacleAhead then
+    raise TObstacleAheadException.Create(FPosition,FDirection)
   else
-    raise TObstacleAheadException.Create(FPosition,FDirection);
+    MoveByOffset(MOVE_FORWARD);
 end;
 
 procedure TMarsRover.MoveBackward;
 begin
-  if not IsObstacleBehind then
-    MoveByOffset(MOVE_BACKWARD)
+  if IsObstacleBehind then
+    raise TObstacleBehindException.Create(FPosition, FDirection)
   else
-    raise TObstacleBehindException.Create(FPosition, FDirection);
+    MoveByOffset(MOVE_BACKWARD);
 end;
 
 procedure TMarsRover.MoveByOffset(const AOffset: Integer);

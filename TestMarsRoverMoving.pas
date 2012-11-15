@@ -170,14 +170,13 @@ begin
 
   try
     MoveRoverForward;
-    Check(False, 'Exception not thrown');
+    Fail('Exception not thrown');
   except
-    on E: TObstacleAheadException do
+    on E: Exception do
     begin
       CheckPositionAndDirection(GRID_TEST_POS_X, GRID_TEST_POS_Y, Direction);
+      CheckInherits(Exception.ClassParent, TObstacleAheadException);
     end;
-    on E: Exception do
-      Check(False, 'Wrong exception thrown: ' + E.Message);
   end;
 end;
 
@@ -187,14 +186,13 @@ begin
 
   try
     MoveRoverBackward;
-    Check(False, 'Exception not thrown');
+    Fail('Exception not thrown');
   except
-    on E: TObstacleBehindException do
+    on E: Exception do
     begin
       CheckPositionAndDirection(GRID_TEST_POS_X, GRID_TEST_POS_Y, Direction);
+      CheckInherits(Exception.ClassParent, TObstacleBehindException);
     end;
-    on E: Exception do
-      Check(False, 'Wrong exception thrown: ' + E.Message);
   end;
 end;
 
