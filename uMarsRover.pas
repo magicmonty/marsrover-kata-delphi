@@ -148,6 +148,10 @@ type
 
 implementation
 
+const
+  MOVE_FORWARD = 1;
+  MOVE_BACKWARD = -1;
+
 {$region 'TGrid'}
 constructor TGrid.Create(const AWidth, AHeight: Integer);
 begin
@@ -234,27 +238,17 @@ end;
 procedure TMarsRover.MoveForward;
 begin
   if not IsObstacleAhead then
-    MoveByOffset(1)
+    MoveByOffset(MOVE_FORWARD)
   else
-  begin
-    raise TObstacleAheadException.Create(
-      FPosition,
-      FDirection
-    );
-  end;
+    raise TObstacleAheadException.Create(FPosition,FDirection);
 end;
 
 procedure TMarsRover.MoveBackward;
 begin
   if not IsObstacleBehind then
-    MoveByOffset(-1)
+    MoveByOffset(MOVE_BACKWARD)
   else
-  begin
-    raise TObstacleBehindException.Create(
-      FPosition,
-      FDirection
-    );
-  end;
+    raise TObstacleBehindException.Create(FPosition, FDirection);
 end;
 
 procedure TMarsRover.MoveByOffset(const AOffset: Integer);
@@ -272,9 +266,9 @@ begin
   else if FDirection = EAST then
     Result.X := Result.X + AOffset
   else if FDirection = SOUTH then
-    Result.Y := Result.Y + (AOffset * -1)
+    Result.Y := Result.Y + (AOffset * MOVE_BACKWARD)
   else
-    Result.X := Result.X + (AOffset * -1);
+    Result.X := Result.X + (AOffset * MOVE_BACKWARD);
 
   Result := FixGridWrap(Result);
 end;
@@ -296,12 +290,12 @@ end;
 
 function TMarsRover.IsObstacleAhead: Boolean;
 begin
-  Result := FGrid.IsObstacleAt(CalcMovePosition(1));
+  Result := FGrid.IsObstacleAt(CalcMovePosition(MOVE_FORWARD));
 end;
 
 function TMarsRover.IsObstacleBehind: Boolean;
 begin
-  Result := FGrid.IsObstacleAt(CalcMovePosition(-1));
+  Result := FGrid.IsObstacleAt(CalcMovePosition(MOVE_BACKWARD));
 end;
 {$endregion 'TMarsRover'}
 
@@ -309,6 +303,7 @@ end;
 constructor TMarsRoverController.Create(const ARover: IMarsRover);
 begin
   inherited Create;
+  Assert(Assigned(ARover), 'Rover must be assigned!');
   FRover := ARover;
   FLastError := '';
 end;
@@ -317,21 +312,13 @@ function TMarsRoverController.ExecuteCommands(const ACommands: string): Boolean;
 var
   i: Integer;
 begin
-  if Assigned(FRover) then
+  FLastError := '';
+  Result := True;
+  for i := 1 to Length(ACommands) do
   begin
-    FLastError := '';
-    Result := True;
-    for i := 1 to Length(ACommands) do
-    begin
-      Result := Result and ExecuteCommand( ACommands[i]);
-      if not Result then
-        break;
-    end;
-  end
-  else
-  begin
-    Result := False;
-    FLastError := 'No Rover assigned';
+    Result := Result and ExecuteCommand( ACommands[i]);
+    if not Result then
+      break;
   end;
 end;
 
