@@ -32,8 +32,6 @@ type
     procedure MoveRoverBackward;
     procedure CheckObstacleForwardException(const Direction: TDirection);
     procedure CheckObstacleBackwardException(const Direction: TDirection);
-  private
-    procedure SurroundWithObstacles;
   published
     procedure IfFacingNorthAndMovingForwardsTheYPosShouldBeIncreasedByOne;
     procedure IfFacingEastAndMovingForwardsTheXPosShouldBeIncreasedByOne;
@@ -147,49 +145,29 @@ begin
 end;
 
 procedure TMarsRoverMovingTest.IfObstacleAheadThrowObstacleAheadException;
+var
+  Direction: TDirection;
 begin
-  SurroundWithObstacles;
+  SurroundCenterPositionWithObstacles;
 
-  SetTestPositionAndDirection(NORTH);
-  CheckObstacleForwardException(NORTH);
-
-  SetTestPositionAndDirection(EAST);
-  CheckObstacleForwardException(EAST);
-
-  SetTestPositionAndDirection(SOUTH);
-  CheckObstacleForwardException(SOUTH);
-
-  SetTestPositionAndDirection(WEST);
-  CheckObstacleForwardException(WEST);
+  for Direction := Low(TDirection) to High(TDirection) do
+    CheckObstacleForwardException(Direction);
 end;
 
 procedure TMarsRoverMovingTest.IfObstacleBehindThrowObstacleBehindException;
+var
+  Direction: TDirection;
 begin
-  SurroundWithObstacles;
+  SurroundCenterPositionWithObstacles;
 
-  SetTestPositionAndDirection(NORTH);
-  CheckObstacleBackwardException(NORTH);
-
-  SetTestPositionAndDirection(EAST);
-  CheckObstacleBackwardException(EAST);
-
-  SetTestPositionAndDirection(SOUTH);
-  CheckObstacleBackwardException(SOUTH);
-
-  SetTestPositionAndDirection(WEST);
-  CheckObstacleBackwardException(WEST);
-end;
-
-procedure TMarsRoverMovingTest.SurroundWithObstacles;
-begin
-  Grid.SetObstacleAt(GRID_TEST_POS_X, GRID_TEST_POS_Y + 1);
-  Grid.SetObstacleAt(GRID_TEST_POS_X + 1, GRID_TEST_POS_Y);
-  Grid.SetObstacleAt(GRID_TEST_POS_X, GRID_TEST_POS_Y - 1);
-  Grid.SetObstacleAt(GRID_TEST_POS_X - 1, GRID_TEST_POS_Y);
+  for Direction := Low(TDirection) to High(TDirection) do
+    CheckObstacleBackwardException(Direction);
 end;
 
 procedure TMarsRoverMovingTest.CheckObstacleForwardException(const Direction: TDirection);
 begin
+  SetTestPositionAndDirection(Direction);
+
   try
     MoveRoverForward;
     Check(False, 'Exception not thrown');
@@ -205,6 +183,8 @@ end;
 
 procedure TMarsRoverMovingTest.CheckObstacleBackwardException(const Direction: TDirection);
 begin
+  SetTestPositionAndDirection(Direction);
+
   try
     MoveRoverBackward;
     Check(False, 'Exception not thrown');

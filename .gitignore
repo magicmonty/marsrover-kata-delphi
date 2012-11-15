@@ -3,3 +3,5 @@ bin
 dcu
 *.res
 *.drc
+*.local
+*.identcache

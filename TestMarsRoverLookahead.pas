@@ -7,31 +7,30 @@ uses
   TestMarsRoverBase,
   uMarsRover;
 
+const
+  SURROUND = True;
+  DONT_SURROUND = FALSE;
+
 type
   TMoveFunction = (mfForward, mfBackward);
   TMinMaxPosition = (posMin, posMax);
 
   TMarsRoverLookaheadTest = class(TMarsRoverBase)
+  strict private
+    procedure SetRoverToCenterAndFacing(const Direction: TDirection);
+    procedure SetupTest(
+      const Direction: TDirection;
+      const SurroundWithObstacles: Boolean);
+  private
+    procedure CheckLookAhead(const SurroundPositionByObstacles,
+      ExpectedResult: Boolean);
+    procedure CheckLookBehind(const SurroundPositionByObstacles,
+      ExpectedResult: Boolean);
   published
-    procedure IfFacingNorthAndNoObstacleIsInNextFieldLookAheadShouldReturnFalse;
-    procedure IfFacingEastAndNoObstacleIsInNextFieldLookAheadShouldReturnFalse;
-    procedure IfFacingSouthAndNoObstacleIsInNextFieldLookAheadShouldReturnFalse;
-    procedure IfFacingWestAndNoObstacleIsInNextFieldLookAheadShouldReturnFalse;
-
-    procedure IfFacingNorthAndNoObstacleIsInNextFieldLookBehindShouldReturnFalse;
-    procedure IfFacingEastAndNoObstacleIsInNextFieldLookBehindShouldReturnFalse;
-    procedure IfFacingSouthAndNoObstacleIsInNextFieldLookBehindShouldReturnFalse;
-    procedure IfFacingWestAndNoObstacleIsInNextFieldLookBehindShouldReturnFalse;
-
-    procedure IfFacingNorthAndAnObstacleIsInNextFieldLookAheadShouldReturnTrue;
-    procedure IfFacingEastAndAnObstacleIsInNextFieldLookAheadShouldReturnTrue;
-    procedure IfFacingSouthAndAnObstacleIsInNextFieldLookAheadShouldReturnTrue;
-    procedure IfFacingWestAndAnObstacleIsInNextFieldLookAheadShouldReturnTrue;
-
-    procedure IfFacingNorthAndAnObstacleIsInNextFieldLookBehindShouldReturnTrue;
-    procedure IfFacingEastAndAnObstacleIsInNextFieldLookBehindShouldReturnTrue;
-    procedure IfFacingSouthAndAnObstacleIsInNextFieldLookBehindShouldReturnTrue;
-    procedure IfFacingWestAndAnObstacleIsInNextFieldLookBehindShouldReturnTrue;
+    procedure IfNoObstacleIsInNextFieldLookAheadShouldReturnFalse;
+    procedure IfNoObstacleIsInPreviousFieldLookBehindShouldReturnFalse;
+    procedure IfAnObstacleIsInNextFieldLookAheadShouldReturnTrue;
+    procedure IfAnObstacleIsInPreviousFieldLookBehindShouldReturnTrue;
   end;
 
 
@@ -40,124 +39,70 @@ implementation
 uses
   Types;
 
-procedure TMarsRoverLookaheadTest.IfFacingNorthAndNoObstacleIsInNextFieldLookAheadShouldReturnFalse;
+const
+  NO_OBSTACLE = False;
+  OBSTACLE_FOUND = True;
+
+procedure TMarsRoverLookaheadTest.IfNoObstacleIsInNextFieldLookAheadShouldReturnFalse;
 begin
-  SetRoverDirection(NORTH);
-  SetRoverPosition(Point(GRID_TEST_POS_X, GRID_TEST_POS_Y));
-  CheckFalse(MarsRover.IsObstacleAhead);
+  CheckLookAhead(DONT_SURROUND, NO_OBSTACLE);
 end;
 
-procedure TMarsRoverLookaheadTest.IfFacingEastAndNoObstacleIsInNextFieldLookAheadShouldReturnFalse;
+procedure TMarsRoverLookaheadTest.IfNoObstacleIsInPreviousFieldLookBehindShouldReturnFalse;
 begin
-  SetRoverDirection(EAST);
-  SetRoverPosition(Point(GRID_TEST_POS_X, GRID_TEST_POS_Y));
-  CheckFalse(MarsRover.IsObstacleAhead);
+  CheckLookBehind(DONT_SURROUND, NO_OBSTACLE);
 end;
 
-procedure TMarsRoverLookaheadTest.IfFacingSouthAndNoObstacleIsInNextFieldLookAheadShouldReturnFalse;
+procedure TMarsRoverLookaheadTest.IfAnObstacleIsInNextFieldLookAheadShouldReturnTrue;
 begin
-  SetRoverDirection(SOUTH);
-  SetRoverPosition(Point(GRID_TEST_POS_X, GRID_TEST_POS_Y));
-  CheckFalse(MarsRover.IsObstacleAhead);
+  CheckLookAhead(SURROUND, OBSTACLE_FOUND);
 end;
 
-procedure TMarsRoverLookaheadTest.IfFacingWestAndNoObstacleIsInNextFieldLookAheadShouldReturnFalse;
+procedure TMarsRoverLookaheadTest.IfAnObstacleIsInPreviousFieldLookBehindShouldReturnTrue;
 begin
-  SetRoverDirection(WEST);
-  SetRoverPosition(Point(GRID_TEST_POS_X, GRID_TEST_POS_Y));
-  CheckFalse(MarsRover.IsObstacleAhead);
+  CheckLookBehind(SURROUND, OBSTACLE_FOUND);
 end;
 
-procedure TMarsRoverLookaheadTest.IfFacingNorthAndNoObstacleIsInNextFieldLookBehindShouldReturnFalse;
+procedure TMarsRoverLookaheadTest.CheckLookAhead(
+  const SurroundPositionByObstacles: Boolean;
+  const ExpectedResult: Boolean);
+var
+  direction: TDirection;
 begin
-  SetRoverDirection(NORTH);
-  SetRoverPosition(Point(GRID_TEST_POS_X, GRID_TEST_POS_Y));
-  CheckFalse(MarsRover.IsObstacleBehind);
+  for direction := Low(TDirection) to High(TDirection) do
+  begin
+    SetupTest(direction, SurroundPositionByObstacles);
+    CheckEquals(ExpectedResult, MarsRover.IsObstacleAhead);
+  end;
 end;
 
-procedure TMarsRoverLookaheadTest.IfFacingEastAndNoObstacleIsInNextFieldLookBehindShouldReturnFalse;
+procedure TMarsRoverLookaheadTest.CheckLookBehind(
+  const SurroundPositionByObstacles: Boolean;
+  const ExpectedResult: Boolean);
+var
+  direction: TDirection;
 begin
-  SetRoverDirection(EAST);
-  SetRoverPosition(Point(GRID_TEST_POS_X, GRID_TEST_POS_Y));
-  CheckFalse(MarsRover.IsObstacleBehind);
+  for direction := Low(TDirection) to High(TDirection) do
+  begin
+    SetupTest(direction, SurroundPositionByObstacles);
+    CheckEquals(ExpectedResult, MarsRover.IsObstacleBehind);
+  end;
 end;
 
-procedure TMarsRoverLookaheadTest.IfFacingSouthAndNoObstacleIsInNextFieldLookBehindShouldReturnFalse;
+procedure TMarsRoverLookaheadTest.SetRoverToCenterAndFacing(
+  const Direction: TDirection);
 begin
-  SetRoverDirection(SOUTH);
-  SetRoverPosition(Point(GRID_TEST_POS_X, GRID_TEST_POS_Y));
-  CheckFalse(MarsRover.IsObstacleBehind);
+  SetRoverCenterPosition;
+  SetRoverDirection(Direction);
 end;
 
-procedure TMarsRoverLookaheadTest.IfFacingWestAndNoObstacleIsInNextFieldLookBehindShouldReturnFalse;
+procedure TMarsRoverLookaheadTest.SetupTest(
+  const Direction: TDirection;
+  const SurroundWithObstacles: Boolean);
 begin
-  SetRoverDirection(WEST);
-  SetRoverPosition(Point(GRID_TEST_POS_X, GRID_TEST_POS_Y));
-  CheckFalse(MarsRover.IsObstacleBehind);
-end;
-
-procedure TMarsRoverLookaheadTest.IfFacingNorthAndAnObstacleIsInNextFieldLookAheadShouldReturnTrue;
-begin
-  SetRoverDirection(NORTH);
-  SetRoverPosition(Point(GRID_TEST_POS_X, GRID_TEST_POS_Y));
-  Grid.SetObstacleAt(GRID_TEST_POS_X, GRID_TEST_POS_Y + 1);
-  CheckTrue(MarsRover.IsObstacleAhead);
-end;
-
-procedure TMarsRoverLookaheadTest.IfFacingEastAndAnObstacleIsInNextFieldLookAheadShouldReturnTrue;
-begin
-  SetRoverDirection(EAST);
-  SetRoverPosition(Point(GRID_TEST_POS_X, GRID_TEST_POS_Y));
-  Grid.SetObstacleAt(GRID_TEST_POS_X + 1, GRID_TEST_POS_Y);
-  CheckTrue(MarsRover.IsObstacleAhead);
-end;
-
-procedure TMarsRoverLookaheadTest.IfFacingSouthAndAnObstacleIsInNextFieldLookAheadShouldReturnTrue;
-begin
-  SetRoverDirection(SOUTH);
-  SetRoverPosition(Point(GRID_TEST_POS_X, GRID_TEST_POS_Y));
-  Grid.SetObstacleAt(GRID_TEST_POS_X, GRID_TEST_POS_Y - 1);
-  CheckTrue(MarsRover.IsObstacleAhead);
-end;
-
-procedure TMarsRoverLookaheadTest.IfFacingWestAndAnObstacleIsInNextFieldLookAheadShouldReturnTrue;
-begin
-  SetRoverDirection(WEST);
-  SetRoverPosition(Point(GRID_TEST_POS_X, GRID_TEST_POS_Y));
-  Grid.SetObstacleAt(GRID_TEST_POS_X - 1, GRID_TEST_POS_Y);
-  CheckTrue(MarsRover.IsObstacleAhead);
-end;
-
-procedure TMarsRoverLookaheadTest.IfFacingNorthAndAnObstacleIsInNextFieldLookBehindShouldReturnTrue;
-begin
-  SetRoverDirection(NORTH);
-  SetRoverPosition(Point(GRID_TEST_POS_X, GRID_TEST_POS_Y));
-  Grid.SetObstacleAt(GRID_TEST_POS_X, GRID_TEST_POS_Y - 1);
-  CheckTrue(MarsRover.IsObstacleBehind);
-end;
-
-procedure TMarsRoverLookaheadTest.IfFacingEastAndAnObstacleIsInNextFieldLookBehindShouldReturnTrue;
-begin
-  SetRoverDirection(EAST);
-  SetRoverPosition(Point(GRID_TEST_POS_X, GRID_TEST_POS_Y));
-  Grid.SetObstacleAt(GRID_TEST_POS_X - 1, GRID_TEST_POS_Y);
-  CheckTrue(MarsRover.IsObstacleBehind);
-end;
-
-procedure TMarsRoverLookaheadTest.IfFacingSouthAndAnObstacleIsInNextFieldLookBehindShouldReturnTrue;
-begin
-  SetRoverDirection(SOUTH);
-  SetRoverPosition(Point(GRID_TEST_POS_X, GRID_TEST_POS_Y));
-  Grid.SetObstacleAt(GRID_TEST_POS_X, GRID_TEST_POS_Y + 1);
-  CheckTrue(MarsRover.IsObstacleBehind);
-end;
-
-procedure TMarsRoverLookaheadTest.IfFacingWestAndAnObstacleIsInNextFieldLookBehindShouldReturnTrue;
-begin
-  SetRoverDirection(WEST);
-  SetRoverPosition(Point(GRID_TEST_POS_X, GRID_TEST_POS_Y));
-  Grid.SetObstacleAt(GRID_TEST_POS_X + 1, GRID_TEST_POS_Y);
-  CheckTrue(MarsRover.IsObstacleBehind);
+  SetRoverToCenterAndFacing(Direction);
+  if SurroundWithObstacles then
+    SurroundCenterPositionWithObstacles;
 end;
 
 initialization

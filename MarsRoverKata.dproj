@@ -2,7 +2,7 @@
 		<PropertyGroup>
 			<ProjectGuid>{A33544E4-294B-4963-953E-98A5BACCBCFA}</ProjectGuid>
 			<ProjectVersion>12.0</ProjectVersion>
-			<Config Condition="'$(Config)'==''">Release</Config>
+			<Config Condition="'$(Config)'==''">Debug</Config>
 			<DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
 			<MainSource>MarsRoverKata.dpr</MainSource>
 		</PropertyGroup>

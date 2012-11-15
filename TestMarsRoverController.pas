@@ -27,6 +27,13 @@ type
 
 implementation
 
+type
+  TCommandTest = record
+    Command: string;
+    InitialPosition: TPoint; InitialDirection: TDirection;
+    ExpectedPosition: TPoint; ExpectedDirection: TDirection;
+  end;
+
 procedure TMarsRoverControllerTest.SetUp;
 begin
   inherited;
@@ -39,36 +46,59 @@ begin
 end;
 
 procedure TMarsRoverControllerTest.TestMoveCommandsWithoutObstacles;
+const
+  TESTS: array [0..9] of TCommandTest = (
+    (Command: 'ffrff';
+       InitialPosition: (X: MIN_X; Y: MIN_Y); InitialDirection: NORTH;
+       ExpectedPosition: (X: MIN_X + 2; Y: MIN_Y + 2); ExpectedDirection: EAST),
+    (Command: 'fflff';
+       InitialPosition: (X: MIN_X; Y: MAX_Y); InitialDirection: SOUTH;
+       ExpectedPosition: (X: MIN_X + 2; Y: MAX_Y - 2); ExpectedDirection: EAST),
+    (Command: 'bf';
+       InitialPosition: (X: MIN_X; Y: MIN_Y); InitialDirection: NORTH;
+       ExpectedPosition: (X: MIN_X; Y: MIN_Y); ExpectedDirection: NORTH),
+    (Command: 'frfrfrfr';
+       InitialPosition: (X: MIN_X; Y: MIN_Y); InitialDirection: NORTH;
+       ExpectedPosition: (X: MIN_X; Y: MIN_Y); ExpectedDirection: NORTH),
+    (Command: 'flflflfl';
+       InitialPosition: (X: MIN_X; Y: MIN_Y); InitialDirection: NORTH;
+       ExpectedPosition: (X: MIN_X; Y: MIN_Y); ExpectedDirection: NORTH),
+    (Command: 'brbrbrbr';
+       InitialPosition: (X: MIN_X; Y: MIN_Y); InitialDirection: NORTH;
+       ExpectedPosition: (X: MIN_X; Y: MIN_Y); ExpectedDirection: NORTH),
+    (Command: 'blblblbl';
+       InitialPosition: (X: MIN_X; Y: MIN_Y); InitialDirection: NORTH;
+       ExpectedPosition: (X: MIN_X; Y: MIN_Y); ExpectedDirection: NORTH),
+    (Command: 'f';
+       InitialPosition: (X: MIN_X; Y: MAX_Y); InitialDirection: NORTH;
+       ExpectedPosition: (X: MIN_X; Y: MIN_Y); ExpectedDirection: NORTH),
+    (Command: 'ff';
+       InitialPosition: (X: MIN_X; Y: MAX_Y); InitialDirection: NORTH;
+       ExpectedPosition: (X: MIN_X; Y: MIN_Y + 1); ExpectedDirection: NORTH),
+    (Command: 'ffff';
+       InitialPosition: (X: MIN_X; Y: MAX_Y - 2); InitialDirection: NORTH;
+       ExpectedPosition: (X: MIN_X; Y: MIN_Y + 1); ExpectedDirection: NORTH)
+  );
+var
+  test: TCommandTest;
 begin
-  CheckTrue(FController.ExecuteCommands('ffrff'), 'ffrff');
-  CheckPositionAndDirection(2, 2, EAST);
-  CheckEqualsString('', FController.LastError);
+  for test in TESTS do
+  begin
+    SetPositionAndDirection(
+      test.InitialPosition.X,
+      test.InitialPosition.Y,
+      test.InitialDirection);
 
-  SetPositionAndDirection(MIN_X, MAX_Y, SOUTH);
-  CheckTrue(FController.ExecuteCommands('fflff'), 'fflff');
-  CheckPositionAndDirection(2, MAX_Y - 2, EAST);
-  CheckEqualsString('', FController.LastError);
+    CheckTrue(FController.ExecuteCommands(test.Command), test.Command);
 
-  SetPositionAndDirection(MIN_X, MIN_Y, NORTH);
-  CheckTrue(FController.ExecuteCommands('bf'), 'bf');
-  CheckPositionAndDirection(MIN_X, MIN_Y, NORTH);
-  CheckEqualsString('', FController.LastError);
+    CheckPositionAndDirection(
+      test.ExpectedPosition.X,
+      test.ExpectedPosition.Y,
+      test.ExpectedDirection,
+      test.Command);
 
-  CheckTrue(FController.ExecuteCommands('frfrfrfr'), 'frfrfrfr');
-  CheckPositionAndDirection(MIN_X, MIN_Y, NORTH);
-  CheckEqualsString('', FController.LastError);
-
-  CheckTrue(FController.ExecuteCommands('flflflfl'), 'flflflfl');
-  CheckPositionAndDirection(MIN_X, MIN_Y, NORTH);
-  CheckEqualsString('', FController.LastError);
-
-  CheckTrue(FController.ExecuteCommands('brbrbrbr'), 'brbrbrbr');
-  CheckPositionAndDirection(MIN_X, MIN_Y, NORTH);
-  CheckEqualsString('', FController.LastError);
-
-  CheckTrue(FController.ExecuteCommands('blblblbl'), 'blblblbl');
-  CheckPositionAndDirection(MIN_X, MIN_Y, NORTH);
-  CheckEqualsString('', FController.LastError);
+    CheckEqualsString('', FController.LastError);
+  end;
 end;
 
 procedure TMarsRoverControllerTest.TestTurnCommands;
