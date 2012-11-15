@@ -23,6 +23,7 @@ type
     procedure TestTurnCommands;
     procedure TestTurnRight;
     procedure TestTurnLeft;
+    procedure TestBadCommand;
   end;
 
 implementation
@@ -143,6 +144,12 @@ begin
   CheckTrue(FController.ExecuteCommands('llll'), 'llll');
   CheckPositionAndDirection(MIN_X, MIN_Y, NORTH);
   CheckEqualsString('', FController.LastError);
+end;
+
+procedure TMarsRoverControllerTest.TestBadCommand;
+begin
+  CheckFalse(FController.ExecuteCommands('kkkk'));
+  CheckPositionAndDirection(MIN_X, MIN_Y, NORTH);
 end;
 
 procedure TMarsRoverControllerTest.TestMoveCommandsWithObstacles;
